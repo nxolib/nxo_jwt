@@ -1,17 +1,21 @@
 -module(nxo_jwt).
 
--export([ verify/1 ]).
+-export([ verify/1, verify/2 ]).
 -include_lib("jose/include/jose_jwt.hrl").
 
 -define(GOOGLE_CERTS,
         "https://www.gstatic.com/iap/verify/public_key").
 
 verify(JWT) ->
+  verify(JWT, true).
+
+verify(JWT, CheckExpiration) ->
   Key = google_key(kid(JWT)),
   case jose_jwt:verify(Key, JWT) of
     {true, Jose_JWT, _} ->
       Claims = Jose_JWT#jose_jwt.fields,
-      case maps:get(<<"exp">>, Claims) > os:system_time(second) of
+      case CheckExpiration =:= false orelse
+        maps:get(<<"exp">>, Claims) > os:system_time(second) of
         true -> {true, Claims};
         false -> {false, jwt_expired}
       end;
