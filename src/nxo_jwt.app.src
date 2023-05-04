@@ -5,7 +5,8 @@
   {mod, {nxo_jwt_app, []}},
   {applications,
    [kernel,
-    stdlib
+    stdlib,
+    nitro_cache
    ]},
   {env,[]},
   {modules, []},
